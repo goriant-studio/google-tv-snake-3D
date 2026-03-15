@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Snake 3D Controller - Use your phone as a D-pad controller for Snake 3D on Chromecast">
+    <title>Snake 3D — Controller</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Google Cast Sender SDK -->
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
+    <link rel="stylesheet" href="css/sender.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header id="header">
+            <h1 class="app-title">SNAKE<span class="accent">3D</span></h1>
+            <div id="cast-status" class="status disconnected">
+                <span class="status-dot"></span>
+                <span id="status-text">Not Connected</span>
+            </div>
+        </header>
+
+        <!-- Game Info -->
+        <div id="game-info">
+            <div class="info-card">
+                <span class="info-label">SCORE</span>
+                <span id="sender-score" class="info-value">0</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">LEVEL</span>
+                <span id="sender-level" class="info-value">1</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">HIGH</span>
+                <span id="sender-high" class="info-value">0</span>
+            </div>
+        </div>
+
+        <!-- Game State Banner -->
+        <div id="game-state-banner" class="hidden">
+            <span id="game-state-text">PLAYING</span>
+        </div>
+
+        <!-- D-Pad Controller -->
+        <div id="controller">
+            <div class="dpad-container">
+                <!-- Up -->
+                <button class="dpad-btn dpad-up" data-direction="UP" aria-label="Up">
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 4l-8 8h16z" fill="currentColor"/></svg>
+                </button>
+                <!-- Left -->
+                <button class="dpad-btn dpad-left" data-direction="LEFT" aria-label="Left">
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path d="M4 12l8-8v16z" fill="currentColor"/></svg>
+                </button>
+                <!-- Center (decorative) -->
+                <div class="dpad-center">
+                    <div class="center-dot"></div>
+                </div>
+                <!-- Right -->
+                <button class="dpad-btn dpad-right" data-direction="RIGHT" aria-label="Right">
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path d="M20 12l-8-8v16z" fill="currentColor"/></svg>
+                </button>
+                <!-- Down -->
+                <button class="dpad-btn dpad-down" data-direction="DOWN" aria-label="Down">
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 20l8-8H4z" fill="currentColor"/></svg>
+                </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="btn-start" class="action-btn primary" aria-label="Start Game">
+                    ▶ START
+                </button>
+                <button id="btn-pause" class="action-btn secondary" aria-label="Pause Game">
+                    ⏸ PAUSE
+                </button>
+            </div>
+        </div>
+
+        <!-- Cast Button -->
+        <div id="cast-section">
+            <google-cast-launcher id="cast-button"></google-cast-launcher>
+            <p class="cast-hint">Tap to connect to Chromecast</p>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p class="footer-text">Snake 3D — Neon Edition</p>
+        </footer>
+    </div>
+
+    <script type="module" src="js/sender.js"></script>
+</body>
+</html>

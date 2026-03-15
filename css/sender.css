@@ -1,0 +1,344 @@
+/* ==========================================
+   Snake 3D — Sender Controller Styles
+   Mobile-first D-pad Controller
+   ========================================== */
+
+:root {
+    --color-bg: #0a0a1a;
+    --color-primary: #00f0ff;
+    --color-secondary: #ff00aa;
+    --color-accent: #00ff88;
+    --color-warning: #ffaa00;
+    --color-text: #e0e8ff;
+    --color-text-dim: rgba(224, 232, 255, 0.4);
+    --color-surface: rgba(20, 20, 40, 0.9);
+    --color-surface-light: rgba(30, 30, 60, 0.8);
+
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-bg);
+    font-family: var(--font-body);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+/* ==========================================
+   Header
+   ========================================== */
+#header {
+    text-align: center;
+    width: 100%;
+}
+
+.app-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: var(--color-text);
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+.app-title .accent {
+    color: var(--color-primary);
+}
+
+/* Connection Status */
+#cast-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff4444;
+    box-shadow: 0 0 6px rgba(255, 68, 68, 0.6);
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+#cast-status.connected .status-dot {
+    background: var(--color-accent);
+    box-shadow: 0 0 6px rgba(0, 255, 136, 0.6);
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ==========================================
+   Game Info Cards
+   ========================================== */
+#game-info {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.info-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.6rem;
+    background: var(--color-surface);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+}
+
+.info-label {
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--color-text-dim);
+}
+
+.info-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+/* ==========================================
+   Game State Banner
+   ========================================== */
+#game-state-banner {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem;
+    background: var(--color-surface);
+    border: 1px solid rgba(255, 0, 170, 0.3);
+    border-radius: 8px;
+}
+
+#game-state-banner.hidden {
+    display: none;
+}
+
+#game-state-text {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    color: var(--color-secondary);
+    text-shadow: 0 0 10px rgba(255, 0, 170, 0.4);
+}
+
+/* ==========================================
+   D-Pad Controller
+   ========================================== */
+#controller {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.dpad-container {
+    display: grid;
+    grid-template-columns: 80px 80px 80px;
+    grid-template-rows: 80px 80px 80px;
+    gap: 6px;
+    justify-items: center;
+    align-items: center;
+}
+
+.dpad-btn {
+    width: 76px;
+    height: 76px;
+    border: 2px solid rgba(0, 240, 255, 0.3);
+    border-radius: 16px;
+    background: var(--color-surface-light);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.dpad-btn:active,
+.dpad-btn.pressed {
+    background: rgba(0, 240, 255, 0.2);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
+    transform: scale(0.92);
+}
+
+.dpad-up { grid-column: 2; grid-row: 1; }
+.dpad-left { grid-column: 1; grid-row: 2; }
+.dpad-right { grid-column: 3; grid-row: 2; }
+.dpad-down { grid-column: 2; grid-row: 3; }
+
+.dpad-center {
+    grid-column: 2;
+    grid-row: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid rgba(0, 240, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.center-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(0, 240, 255, 0.3);
+}
+
+/* ==========================================
+   Action Buttons
+   ========================================== */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 0.9rem 1rem;
+    border: 2px solid;
+    border-radius: 12px;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.action-btn.primary {
+    background: rgba(0, 255, 136, 0.1);
+    border-color: rgba(0, 255, 136, 0.4);
+    color: var(--color-accent);
+}
+
+.action-btn.primary:active {
+    background: rgba(0, 255, 136, 0.25);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    transform: scale(0.95);
+}
+
+.action-btn.secondary {
+    background: rgba(255, 170, 0, 0.1);
+    border-color: rgba(255, 170, 0, 0.4);
+    color: var(--color-warning);
+}
+
+.action-btn.secondary:active {
+    background: rgba(255, 170, 0, 0.25);
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+    transform: scale(0.95);
+}
+
+/* ==========================================
+   Cast Section
+   ========================================== */
+#cast-section {
+    text-align: center;
+}
+
+google-cast-launcher {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    --connected-color: var(--color-accent);
+    --disconnected-color: var(--color-text-dim);
+    cursor: pointer;
+}
+
+.cast-hint {
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    margin-top: 0.3rem;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================
+   Footer
+   ========================================== */
+footer {
+    text-align: center;
+}
+
+.footer-text {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--color-text-dim);
+}
+
+/* ==========================================
+   Responsive
+   ========================================== */
+@media (min-height: 700px) {
+    .dpad-container {
+        grid-template-columns: 90px 90px 90px;
+        grid-template-rows: 90px 90px 90px;
+    }
+
+    .dpad-btn {
+        width: 86px;
+        height: 86px;
+    }
+}
+
+@media (min-height: 800px) {
+    .dpad-container {
+        grid-template-columns: 100px 100px 100px;
+        grid-template-rows: 100px 100px 100px;
+    }
+
+    .dpad-btn {
+        width: 96px;
+        height: 96px;
+    }
+}
