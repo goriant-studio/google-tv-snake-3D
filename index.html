@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <meta name="description" content="Snake 3D - A neon cyberpunk snake game optimized for Google TV and Chromecast">
+    <title>Snake 3D — Neon Edition</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Game Canvas (Three.js renders here) -->
+    <div id="game-container"></div>
+
+    <!-- UI Overlays -->
+    <div id="ui-overlay">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="game-title">SNAKE<span class="accent">3D</span></h1>
+            <p class="subtitle">NEON EDITION</p>
+            <div class="start-prompt pulse">
+                <span class="key-hint">▶ PRESS ENTER TO START ◀</span>
+            </div>
+            <div class="controls-hint">
+                <p>🎮 Arrow Keys / D-pad to move</p>
+                <p>⏸ Space to pause</p>
+            </div>
+        </div>
+
+        <!-- HUD -->
+        <div id="hud" class="screen">
+            <div class="hud-left">
+                <div class="score-display">
+                    <span class="score-label">SCORE</span>
+                    <span id="score-value" class="score-value">0</span>
+                </div>
+            </div>
+            <div class="hud-right">
+                <div class="score-display">
+                    <span class="score-label">HIGH SCORE</span>
+                    <span id="high-score-value" class="score-value">0</span>
+                </div>
+            </div>
+            <div class="hud-center">
+                <span id="level-display" class="level-text">LEVEL 1</span>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="screen">
+            <h2 class="pause-title">⏸ PAUSED</h2>
+            <p class="pause-hint">Press Space to resume</p>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen">
+            <h2 class="gameover-title">GAME OVER</h2>
+            <div class="gameover-stats">
+                <p>SCORE: <span id="final-score" class="accent">0</span></p>
+                <p>HIGH SCORE: <span id="final-high-score" class="accent">0</span></p>
+            </div>
+            <div class="start-prompt pulse">
+                <span class="key-hint">▶ PRESS ENTER TO RESTART ◀</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
