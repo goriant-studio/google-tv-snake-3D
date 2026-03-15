@@ -30,9 +30,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Fullscreen immersive mode
-        setupFullscreen()
-
         // Create WebView programmatically (no XML layout needed)
         webView = WebView(this).apply {
             // Enable JavaScript (required for Three.js)
@@ -48,6 +45,10 @@ class MainActivity : ComponentActivity() {
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.allowFileAccess = true
             settings.allowContentAccess = true
+            @Suppress("DEPRECATION")
+            settings.allowFileAccessFromFileURLs = true
+            @Suppress("DEPRECATION")
+            settings.allowUniversalAccessFromFileURLs = true
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
             // Disable scrolling / overscroll
@@ -67,6 +68,10 @@ class MainActivity : ComponentActivity() {
 
         setContentView(webView)
 
+        // Fullscreen immersive mode — must be called AFTER setContentView
+        // so the window is fully attached and DecorView is not null
+        setupFullscreen()
+
         // Load game from assets
         webView.loadUrl("file:///android_asset/www/index.html")
     }
@@ -79,12 +84,22 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.let { controller ->
-                controller.hide(WindowInsets.Type.systemBars())
-                controller.systemBarsBehavior =
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            // insetsController may be null if window is not yet fully attached;
+            // use window.decorView.post to defer if needed
+            val applyInsets = Runnable {
+                window.insetsController?.let { controller ->
+                    controller.hide(WindowInsets.Type.systemBars())
+                    controller.systemBarsBehavior =
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            }
+            if (window.insetsController != null) {
+                applyInsets.run()
+            } else {
+                window.decorView.post(applyInsets)
             }
         } else {
+
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -97,40 +112,65 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * Forward D-pad key events to WebView
-     *
-     * The TV remote D-pad sends standard KeyEvent codes:
-     * - KEYCODE_DPAD_UP, DOWN, LEFT, RIGHT
-     * - KEYCODE_DPAD_CENTER (select/enter)
-     * - KEYCODE_ENTER
-     *
-     * These are automatically mapped to keyboard events in WebView,
-     * so the web game's existing arrow key handling works out of the box.
-     */
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        // Let WebView handle D-pad and Enter natively
-        when (keyCode) {
-            KeyEvent.KEYCODE_DPAD_UP,
-            KeyEvent.KEYCODE_DPAD_DOWN,
-            KeyEvent.KEYCODE_DPAD_LEFT,
-            KeyEvent.KEYCODE_DPAD_RIGHT,
-            KeyEvent.KEYCODE_DPAD_CENTER,
-            KeyEvent.KEYCODE_ENTER,
-            KeyEvent.KEYCODE_SPACE,
-            KeyEvent.KEYCODE_BUTTON_A,
-            KeyEvent.KEYCODE_BUTTON_B,
-            KeyEvent.KEYCODE_BUTTON_START -> {
-                // Forward to WebView — it will dispatch as KeyboardEvent
-                return webView.dispatchKeyEvent(event!!)
-            }
+    // Maps Android KeyEvent code → web KeyboardEvent.key string
+    private val keyCodeToJsKey = mapOf(
+        KeyEvent.KEYCODE_DPAD_UP        to "ArrowUp",
+        KeyEvent.KEYCODE_DPAD_DOWN      to "ArrowDown",
+        KeyEvent.KEYCODE_DPAD_LEFT      to "ArrowLeft",
+        KeyEvent.KEYCODE_DPAD_RIGHT     to "ArrowRight",
+        KeyEvent.KEYCODE_DPAD_CENTER    to "Enter",
+        KeyEvent.KEYCODE_ENTER          to "Enter",
+        KeyEvent.KEYCODE_SPACE          to "Space",
+        KeyEvent.KEYCODE_BUTTON_A       to "Enter",
+        KeyEvent.KEYCODE_BUTTON_B       to "Escape",
+        KeyEvent.KEYCODE_BUTTON_START   to "Enter"
+    )
 
-            KeyEvent.KEYCODE_BACK -> {
-                return handleBackPress()
+    /**
+     * Inject a real KeyboardEvent into the page's document so the game JS
+     * listeners receive it — WebView native dispatch only moves DOM focus.
+     */
+    private fun injectKeyEvent(jsKey: String, type: String) {
+        val safeKey = jsKey.replace("\\", "\\\\").replace("\"", "\\\"")
+        val js = """
+            try {
+                var e = new KeyboardEvent('$type', {
+                    key: "$safeKey",
+                    code: "$safeKey",
+                    bubbles: true,
+                    cancelable: true
+                });
+                window.dispatchEvent(e);
+            } catch(err) {
+                console.error("Snake3D KeyInject Error:", err);
             }
+        """.trimIndent()
+        webView.evaluateJavascript(js, null)
+    }
+
+    /**
+     * Intercept D-pad / remote key events BEFORE WebView consumes them.
+     * WebView natively consumes DPAD_CENTER / ENTER for synthetic clicks.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val jsKey = keyCodeToJsKey[event.keyCode]
+        
+        if (jsKey != null) {
+            // Only inject on down/up, avoid multiple repeats if not needed or handle naturally
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                injectKeyEvent(jsKey, "keydown")
+            } else if (event.action == KeyEvent.ACTION_UP) {
+                injectKeyEvent(jsKey, "keyup")
+            }
+            // Always consume our known game keys so WebView doesn't do focus navigation
+            return true
         }
 
-        return super.onKeyDown(keyCode, event)
+        if (event.keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
+            return handleBackPress()
+        }
+
+        return super.dispatchKeyEvent(event)
     }
 
     /**
